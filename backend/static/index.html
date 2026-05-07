@@ -43,7 +43,7 @@
         <main class="main-content">
             <header>
                 <div>
-                    <h1>Good Morning, Sarah</h1>
+                    <h1>Good Morning, <span id="profile-name">User</span></h1>
                     <p class="subtitle">Here's your symptom summary for today.</p>
                 </div>
                 <div class="user-profile">
@@ -55,14 +55,10 @@
             <section class="hero-summary">
                 <div class="card summary-card primary">
                     <h3>Hot Flashes Today</h3>
-                    <div class="value">3</div>
-                    <div class="trend positive"><i class="fa-solid fa-arrow-down"></i> 2 fewer than yesterday</div>
+                    <div class="value" id="hot-flash-count">0</div>
+                    <div class="trend" id="hot-flash-trend">No data yet</div>
                 </div>
-                <div class="card summary-card">
-                    <h3>Avg Severity</h3>
-                    <div class="value">Mild</div>
-                    <div class="trend neutral">Consistent with weekly avg</div>
-                </div>
+                
                 <div class="card summary-card">
                     <h3>Current Conductance</h3>
                     <div class="value"><span id="hero-conductance">--</span> <small>µS</small></div>
@@ -142,23 +138,23 @@
                 <!-- Symptom Pattern Insights -->
                 <section class="insights-section">
                     <div class="card">
-                        <h2>Symptom Insights</h2>
-                        <ul class="insight-list">
+                        <h2>Sensor Insights</h2>
+                        <ul class="insight-list" id="insight-list">
                             <li>
-                                <i class="fa-solid fa-sun text-orange"></i>
-                                <p>Symptoms cluster most often in the <strong>late afternoon</strong>.</p>
+                                <i class="fa-solid fa-circle-info text-blue"></i>
+                                <p>Insights will update after enough real sensor data is collected.</p>
                             </li>
                             <li>
-                                <i class="fa-solid fa-temperature-arrow-up text-red"></i>
-                                <p>Higher humidity (>50%) appears to correlate with <strong>stronger events</strong>.</p>
+                                <i class="fa-solid fa-temperature-half text-orange"></i>
+                                <p>Temperature and humidity are being monitored from the SHT20 sensor.</p>
                             </li>
                             <li>
-                                <i class="fa-solid fa-bed text-blue"></i>
-                                <p>Nighttime episodes <strong>decreased</strong> this week by 15%.</p>
+                                <i class="fa-solid fa-wave-square text-green"></i>
+                                <p>EDA-based detection will activate when valid conductance data is available.</p>
                             </li>
                             <li>
-                                <i class="fa-solid fa-person-running text-green"></i>
-                                <p>Recent events occurred during low-activity periods, making hot flashes more likely than exercise-related sweating.</p>
+                                <i class="fa-solid fa-stethoscope text-red"></i>
+                                <p>This dashboard is for prototype monitoring, not medical diagnosis.</p>
                             </li>
                         </ul>
                     </div>
@@ -167,6 +163,6 @@
 
         </main>
     </div>
-    <script src="/static/app.js"></script>
+    <script src="/static/testapp.js"></script>
 </body>
 </html>

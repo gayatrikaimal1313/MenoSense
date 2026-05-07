@@ -168,7 +168,7 @@ header h1 {
 /* Hero Summary */
 .hero-summary {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
 }

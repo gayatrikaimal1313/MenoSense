@@ -91,6 +91,8 @@ const tempChart = new Chart(tempCtx, tempChartConfig);
 
 let baseline = 0.59;
 const MAX_DATAPOINTS = 100;
+let hotFlashCount = 0;
+let lastDetectedState = false;
 
 async function fetchData() {
     try {
@@ -98,7 +100,7 @@ async function fetchData() {
         const data = await response.json();
         
         if (data.history) {
-            updateDashboard(data.history, data.inference, data.lastSync, data.deviceConnected);
+            updateDashboard(data.history, data.inference, data.lastSync, data.deviceConnected, data.profileName, data.eventCount, data.insights);
         }
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -107,7 +109,7 @@ async function fetchData() {
     }
 }
 
-function updateDashboard(history, inference, lastSync, deviceConnected) {
+function updateDashboard(history, inference, lastSync, deviceConnected, profileName, eventCount, insights) {
     const statusEl = document.getElementById('nav-connection-status');
     const statusDot = statusEl.previousElementSibling;
     const heroConductance = document.getElementById('hero-conductance');
@@ -131,9 +133,53 @@ function updateDashboard(history, inference, lastSync, deviceConnected) {
     if (hour >= 18) greetingText = "Good Evening";
 
     const name = profileName || "Gutruf";
+
     if (greetingEl) {
-    greetingEl.innerHTML = `${greetingText}, <span id="profile-name">${name}</span>`;
-}
+        greetingEl.innerHTML = `${greetingText}, <span id="profile-name">${name}</span>`;
+    }
+    
+    // Update patient/device name if backend provides one
+    const nameEl = document.getElementById('profile-name') 
+                || document.getElementById('user-name') 
+                || document.getElementById('device-name');
+    
+    if (nameEl && profileName) {
+        nameEl.textContent = profileName;
+    }
+
+    // Update hot flash count
+    const isDetected = inference && inference.state && inference.state.includes("Detected");
+
+    if (isDetected && !lastDetectedState) {
+        hotFlashCount += 1;
+    }
+
+    lastDetectedState = isDetected;
+
+    const hotFlashCountEl = document.getElementById('hot-flash-count') 
+         || document.getElementById('event-count');
+
+    if (hotFlashCountEl) {
+        hotFlashCountEl.textContent = hotFlashCount;
+    }
+
+    const trendEl = document.getElementById('hot-flash-trend');
+
+    if (trendEl) {
+        if (hotFlashCount === 0) {
+            trendEl.textContent = "No events today";
+            trendEl.className = "trend neutral";
+        } else if (hotFlashCount < 3) {
+            trendEl.innerHTML = '<i class="fa-solid fa-arrow-down"></i> Low frequency';
+            trendEl.className = "trend positive";
+        } else if (hotFlashCount < 6) {
+            trendEl.textContent = "Moderate frequency";
+            trendEl.className = "trend neutral";
+        } else {
+            trendEl.innerHTML = '<i class="fa-solid fa-arrow-up"></i> High frequency';
+            trendEl.className = "trend text-red";
+        }
+    }
     
     // Update Hero
     heroConductance.textContent = latest.edaAvailable ? latest.conductance.toFixed(2) : '--';
@@ -177,9 +223,12 @@ function updateDashboard(history, inference, lastSync, deviceConnected) {
             stateEl.textContent += ` (${inference.source})`;
         }
 
-        if (inference.state.includes("Detected")) {
+        if (inference && inference.state && inference.state.includes("Detected")) {
             stateEl.className = 'state-event';
-            heroTrend.textContent = inference.source.includes("Temp") ? 'Temp Spike' : 'Rising Rapidly';
+            heroTrend.textContent =  
+                inference.source && inference.source.includes("Temp")
+                    ? 'Temp Spike'
+                    : 'Rising Rapidly';
             heroTrend.className = 'trend text-red';
         } else {
             stateEl.className = 'state-stable';
@@ -201,6 +250,16 @@ function updateDashboard(history, inference, lastSync, deviceConnected) {
         document.getElementById('nav-last-sync').textContent = new Date(lastSync * 1000).toLocaleTimeString();
     } else {
         document.getElementById('nav-last-sync').textContent = 'Never';
+    }
+    const insightList = document.getElementById("insight-list");
+
+    if (insightList && insights) {
+        insightList.innerHTML = insights.map(text => `
+            <li>
+                <i class="fa-solid fa-circle-info text-blue"></i>
+                <p>${text}</p>
+            </li>
+        `).join("");
     }
 }
 
